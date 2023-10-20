@@ -191,6 +191,8 @@ final class ArcanistDiffParser extends Phobject {
       throw new Exception(pht("Can't parse an empty diff!"));
     }
 
+    echo "ARCANIST: parsing diff: ".$diff."\n";
+
     // Detect `git-format-patch`, by looking for a "---" line somewhere in
     // the file and then a footer with Git version number, which looks like
     // this:
@@ -251,6 +253,7 @@ final class ArcanistDiffParser extends Phobject {
       );
 
       $line = $this->getLineTrimmed();
+      echo "ARCANIST: processing line:".$line."\n";
       $match = null;
       $ok = $this->tryMatchHeader($patterns, $line, $match);
 
@@ -290,10 +293,13 @@ final class ArcanistDiffParser extends Phobject {
 
       if (isset($match['type'])) {
         if ($match['type'] == 'diff --git') {
+          echo "ARCANIST: type is 'diff --git'\n";
           $filename = self::extractGitCommonFilename($match['oldnew']);
           if ($filename !== null) {
             $match['old'] = $filename;
             $match['cur'] = $filename;
+          } else {
+            echo "ARCANIST: filename is null\n";
           }
         }
       }
@@ -315,6 +321,7 @@ final class ArcanistDiffParser extends Phobject {
       }
 
       $line = $this->nextLine();
+      echo "ARCANIST: processing changes with diff line: ".$line."\n";
 
       switch ($match['type']) {
         case 'Index':
@@ -371,6 +378,7 @@ final class ArcanistDiffParser extends Phobject {
   }
 
   protected function tryMatchHeader($patterns, $line, &$match) {
+    echo "ARCANIST: tryMatchHeader: ".$line."\n";
     foreach ($patterns as $pattern) {
       if (preg_match('@^'.$pattern.'$@', $line, $match)) {
         return true;
@@ -1328,6 +1336,7 @@ final class ArcanistDiffParser extends Phobject {
    * @return string Filename being altered, or null for a rename.
    */
   public static function extractGitCommonFilename($paths) {
+    echo "ARCANIST: extractGitCommonFilename: $paths\n";
     $matches = null;
     $paths = rtrim($paths, "\r\n");
 
