@@ -191,7 +191,10 @@ final class ArcanistDiffParser extends Phobject {
       throw new Exception(pht("Can't parse an empty diff!"));
     }
 
-    echo "ARCANIST: parsing diff: ".$diff."\n";
+    $console = PhutilConsole::getConsole();
+    $console->writeLog(
+      "%s\n",
+      pht("Parsing diff: %s", $diff));
 
     // Detect `git-format-patch`, by looking for a "---" line somewhere in
     // the file and then a footer with Git version number, which looks like
@@ -253,7 +256,9 @@ final class ArcanistDiffParser extends Phobject {
       );
 
       $line = $this->getLineTrimmed();
-      echo "ARCANIST: processing line:".$line."\n";
+      $console->writeLog(
+        "%s\n",
+        pht("Processing line: %s", $line));
       $match = null;
       $ok = $this->tryMatchHeader($patterns, $line, $match);
 
@@ -293,13 +298,17 @@ final class ArcanistDiffParser extends Phobject {
 
       if (isset($match['type'])) {
         if ($match['type'] == 'diff --git') {
-          echo "ARCANIST: type is 'diff --git'\n";
+          $console->writeLog(
+            "%s\n",
+            pht("diff type is diff --git"));
           $filename = self::extractGitCommonFilename($match['oldnew']);
           if ($filename !== null) {
             $match['old'] = $filename;
             $match['cur'] = $filename;
           } else {
-            echo "ARCANIST: filename is null\n";
+            $console->writeLog(
+              "%s\n",
+              pht("filename is null"));
           }
         }
       }
@@ -321,7 +330,9 @@ final class ArcanistDiffParser extends Phobject {
       }
 
       $line = $this->nextLine();
-      echo "ARCANIST: processing changes with diff line: ".$line."\n";
+      $console->writeLog(
+        "%s\n",
+        pht("processing changes with diff line: %s", $line));
 
       switch ($match['type']) {
         case 'Index':
@@ -378,7 +389,10 @@ final class ArcanistDiffParser extends Phobject {
   }
 
   protected function tryMatchHeader($patterns, $line, &$match) {
-    echo "ARCANIST: tryMatchHeader: ".$line."\n";
+    $console = PhutilConsole::getConsole();
+    $console->writeLog(
+      "%s\n",
+      pht("tryMatchHeader: %s", $line));
     foreach ($patterns as $pattern) {
       if (preg_match('@^'.$pattern.'$@', $line, $match)) {
         return true;
@@ -1336,7 +1350,8 @@ final class ArcanistDiffParser extends Phobject {
    * @return string Filename being altered, or null for a rename.
    */
   public static function extractGitCommonFilename($paths) {
-    echo "ARCANIST: extractGitCommonFilename: $paths\n";
+    $console = PhutilConsole::getConsole();
+    $console->writeLog("%s\n", pht("extractGitCommonFilename: %s", $paths));
     $matches = null;
     $paths = rtrim($paths, "\r\n");
 
